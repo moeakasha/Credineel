@@ -1,0 +1,240 @@
+.eligibility-rules-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  background-color: #000000;
+}
+
+.eligibility-rules-page .dashboard-layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.eligibility-rules-page .dashboard-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  margin-left: 260px;
+  transition: margin-left 0.3s ease;
+  background-color: #ffffff;
+  position: relative;
+  min-height: calc(100vh - 80px);
+  border-radius: 12px 12px 0px 0px;
+}
+
+.eligibility-rules-page .dashboard-main:not(.sidebar-open) {
+  margin-left: 0;
+}
+
+.eligibility-rules-page .sidebar-backdrop {
+  display: none;
+  position: fixed;
+  top: 80px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+.eligibility-rules-page .sidebar-backdrop.visible {
+  display: block;
+}
+
+.eligibility-rules-content {
+  padding: 2rem;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header Section */
+.eligibility-rules-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #000000;
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+}
+
+.page-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-box .search-input {
+  width: 280px;
+  padding: 0.625rem 1rem 0.625rem 2.75rem;
+  background-color: #FBFBFB;
+  border: 1px solid #E7E7E7;
+  border-radius: 8px;
+  color: #000000;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.search-box .search-input::placeholder {
+  color: #9CA3AF;
+}
+
+.search-box .search-input:focus {
+  border-color: #4C13F8;
+  box-shadow: 0 0 0 3px rgba(76, 19, 248, 0.1);
+}
+
+.search-box .search-icon {
+  position: absolute;
+  left: 1rem;
+  color: #9CA3AF;
+  font-size: 20px;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background-color: #FBFBFB;
+  border: 1px solid #E7E7E7;
+  border-radius: 8px;
+  color: #000000;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.action-button .material-icons-outlined {
+  font-size: 20px;
+}
+
+.action-button:hover {
+  background-color: #F3F4F6;
+  border-color: #D1D5DB;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) and (min-width: 1025px) {
+  .eligibility-rules-page .dashboard-main.sidebar-open {
+    margin-left: 80px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .eligibility-rules-page .dashboard-main {
+    margin-left: 0;
+  }
+
+  .eligibility-rules-page .dashboard-main.sidebar-open {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 1024px) {
+  .eligibility-rules-page .dashboard-main {
+    margin-left: 0;
+    min-height: calc(100vh - 64px);
+  }
+
+  .eligibility-rules-page .sidebar-backdrop {
+    top: 64px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .eligibility-rules-content {
+    padding: 1.5rem;
+  }
+
+  .search-box .search-input {
+    width: 220px;
+  }
+}
+
+@media (max-width: 768px) {
+  .eligibility-rules-content {
+    padding: 1rem;
+  }
+
+  .eligibility-rules-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .page-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .search-box .search-input {
+    width: 100%;
+    min-width: 200px;
+  }
+}
+
+@media (max-width: 640px) {
+  .eligibility-rules-content {
+    padding: 0.75rem;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
+
+  .page-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+
+  .search-box .search-input {
+    width: 100%;
+  }
+
+  .action-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .eligibility-rules-page .dashboard-main {
+    min-height: calc(100vh - 64px);
+  }
+
+  .page-title {
+    font-size: 18px;
+  }
+}

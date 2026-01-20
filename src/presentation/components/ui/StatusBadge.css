@@ -1,0 +1,27 @@
+.status-badge {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  text-transform: capitalize;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.status-badge.status-amber {
+  background-color: #FEF3C7;
+  color: #D97706;
+}
+
+.status-badge.status-green {
+  background-color: #D1FAE5;
+  color: #059669;
+}
+
+.status-badge.status-yellow {
+  background-color: #FEF9C3;
+  color: #CA8A04;
+}
