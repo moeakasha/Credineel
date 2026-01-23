@@ -111,6 +111,39 @@
   box-shadow: 0 6px 16px rgba(35, 18, 208, 0.25);
 }
 
+.page-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.history-button {
+  background: #ffffff !important;
+  color: #2312D0 !important;
+  border: 1px solid #2312D0 !important;
+  border-radius: 50px !important;
+  padding: 12px 24px !important;
+  font-weight: 600 !important;
+  font-size: 0.95rem !important;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 48px;
+  box-sizing: border-box;
+}
+
+.history-button:hover {
+  background: #f8f9ff !important;
+  transform: translateY(-1px);
+}
+
+.history-button .material-icons-outlined {
+  font-size: 20px;
+}
+
 /* Category Sections - Container */
 .category-section {
   background: white;

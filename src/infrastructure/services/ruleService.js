@@ -66,3 +66,102 @@ export const recalculateAllScores = async () => {
     throw error
   }
 }
+
+/**
+ * Fetch eligibility rules edit history
+ * @returns {Promise<Array>}
+ */
+export const fetchRulesHistory = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('eligibility_rules_history')
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+    return data
+  } catch (error) {
+    console.error('Error fetching rules history:', error)
+    throw error
+  }
+}
+
+/**
+ * Save a snapshot of the current rules and thresholds to history
+ * @param {Object} editorInfo - { name, email, avatar_url }
+ * @returns {Promise<Object>}
+ */
+export const saveRuleHistory = async (editorInfo) => {
+  try {
+    // Get current rules
+    const { data: rules, error: rulesError } = await supabase
+      .from('eligibility_rules')
+      .select('*')
+    if (rulesError) throw rulesError
+
+    // Get current thresholds
+    const { data: thresholds, error: thresholdsError } = await supabase
+      .from('score_thresholds')
+      .select('*')
+    if (thresholdsError) throw thresholdsError
+
+    const { data, error } = await supabase
+      .from('eligibility_rules_history')
+      .insert({
+        editor_name: editorInfo.name,
+        editor_email: editorInfo.email,
+        editor_avatar_url: editorInfo.avatar_url || null,
+        rules_snapshot: rules,
+        thresholds_snapshot: thresholds
+      })
+      .select()
+
+    if (error) throw error
+    return data[0]
+  } catch (error) {
+    console.error('Error saving rule history:', error)
+    throw error
+  }
+}
+
+/**
+ * Restore rules and thresholds from a history snapshot
+ * @param {Object} record - The history record to restore from
+ * @returns {Promise<void>}
+ */
+export const restoreRuleVersion = async (record) => {
+  try {
+    const { rules_snapshot, thresholds_snapshot } = record
+
+    // Restore rules
+    for (const rule of rules_snapshot) {
+      const { error } = await supabase
+        .from('eligibility_rules')
+        .update({
+          min_value: rule.min_value,
+          max_value: rule.max_value,
+          weight_pct: rule.weight_pct,
+          label: rule.label
+        })
+        .match({ id: rule.id })
+      if (error) throw error
+    }
+
+    // Restore thresholds
+    for (const threshold of thresholds_snapshot) {
+      const { error } = await supabase
+        .from('score_thresholds')
+        .update({
+          min_value: threshold.min_value,
+          color_code: threshold.color_code,
+          label: threshold.label,
+          sort_order: threshold.sort_order
+        })
+        .match({ id: threshold.id })
+      if (error) throw error
+    }
+  } catch (error) {
+    console.error('Error restoring rule version:', error)
+    throw error
+  }
+}

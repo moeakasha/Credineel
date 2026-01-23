@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import DashboardSidebar from '../components/dashboard/DashboardSidebar'
 import DashboardHeader from '../components/dashboard/DashboardHeader'
-import { fetchRules, updateRule, recalculateAllScores } from '../../infrastructure/services/ruleService'
+import { fetchRules, updateRule, recalculateAllScores, fetchRulesHistory, saveRuleHistory, restoreRuleVersion } from '../../infrastructure/services/ruleService'
 import { getScoreThresholds, updateScoreThreshold } from '../../infrastructure/services/thresholdService'
+import { useAuth } from '../../presentation/context/AuthContext'
+import RuleHistorySlider from '../components/dashboard/RuleHistorySlider'
 import './EligibilityRulesPage.css'
 
 /**
@@ -22,6 +24,10 @@ const EligibilityRulesPage = () => {
   const [thresholdEditValues, setThresholdEditValues] = useState({});
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [notification, setNotification] = useState(null);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [historyData, setHistoryData] = useState([]);
+  const [isRestoring, setIsRestoring] = useState(false);
+  const { user } = useAuth();
 
   // Handle window resize for responsive sidebar
   useEffect(() => {
@@ -124,12 +130,56 @@ const EligibilityRulesPage = () => {
     setUpdating(true);
     try {
       await recalculateAllScores();
-      setNotification({ type: 'success', message: 'All customer scores updated successfully!' });
+
+      // Save history snapshot when recalculation is triggered
+      if (user) {
+        await saveRuleHistory({
+          name: user.name,
+          email: user.email,
+          avatar_url: user.avatar_url
+        });
+      }
+
+      setNotification({ type: 'success', message: 'All customer scores updated and version saved to history!' });
     } catch (error) {
       console.error('Recalculation failed:', error);
       setNotification({ type: 'error', message: 'Sync failed. Please check your connection.' });
     } finally {
       setUpdating(false);
+    }
+  };
+
+  const handleOpenHistory = async () => {
+    try {
+      const data = await fetchRulesHistory();
+      setHistoryData(data || []);
+      setIsHistoryOpen(true);
+    } catch (error) {
+      console.error('Failed to load history:', error);
+      setNotification({ type: 'error', message: 'Failed to load history records.' });
+    }
+  };
+
+  const handleRestoreVersion = async (record) => {
+    if (!window.confirm('Are you sure you want to restore these numbers? You will need to click "Re-Calculate All" to apply them to all customers.')) {
+      return;
+    }
+
+    setIsRestoring(true);
+    try {
+      // 1. Restore rule and threshold values in DB
+      await restoreRuleVersion(record);
+
+      // 2. Reload UI data to show the restored numbers
+      await loadData();
+
+      setNotification({ type: 'success', message: 'Numbers restored! Click "Re-Calculate All" to apply changes.' });
+      setIsHistoryOpen(false);
+    } catch (error) {
+      console.error('Restore failed:', error);
+      setNotification({ type: 'error', message: 'Failed to restore version.' });
+    } finally {
+      setIsRestoring(false);
     }
   };
 
@@ -210,6 +260,14 @@ const EligibilityRulesPage = () => {
                 <p className="page-subtitle">Manage criteria and weights for credit scoring. Updates reflect immediately.</p>
               </div>
               <div className="page-actions">
+                <button
+                  className="action-button history-button"
+                  onClick={handleOpenHistory}
+                  title="View edit history"
+                >
+                  <span className="material-icons-outlined">history</span>
+                  <span>History</span>
+                </button>
                 <button
                   className={`action-button recalculate-button ${updating ? 'loading' : ''}`}
                   onClick={handleRecalculate}
@@ -470,6 +528,15 @@ const EligibilityRulesPage = () => {
           </button>
         </div>
       )}
+
+      {/* History Slider */}
+      <RuleHistorySlider
+        isOpen={isHistoryOpen}
+        onClose={() => setIsHistoryOpen(false)}
+        history={historyData}
+        onRestore={handleRestoreVersion}
+        isRestoring={isRestoring}
+      />
     </div>
   )
 }
